@@ -1,11 +1,23 @@
 import streamlit as st
 import time
+def user_input(user_question):
+    response = st.session_state.conversation({'question': user_question})
+    st.session_state.chatHistory = response['chat_history']
+    for i, message in enumerate(st.session_state.chatHistory):
+        if i % 2 == 0:
+            st.write("User: ", message.content)
+        else:
+            st.write("Reply: ", message.content)
 
 def main():
     st.set_page_config("Information Retrieval")
     st.header("Information-Retrieval-System 🤖")
 
     user_query = st.text_input("Enter your query here:")
+    if "conversation" not in st.session_state:
+        st.session_state.conversation = None
+    if "chatHistory" not in st.session_state:
+        st.session_state.chatHistory = None
 
     with st.sidebar:
         st.title("Menu:")
@@ -19,17 +31,8 @@ def main():
                 text_chunks = get_text_chunks(raw_text)
                 vector_store = get_vector_store(text_chunks)
                 st.session_state.conversation = get_conversational_chain(vector_store)
-            st.success("Done")
+                st.success("Done")
 
     
-
-    # Initialize session state variables
-    if "conversation" not in st.session_state:
-        st.session_state.conversation = None
-    if "chatHistory" not in st.session_state:
-        st.session_state.chatHistory = None
-
-  
-
 if __name__ == "__main__":
     main()
